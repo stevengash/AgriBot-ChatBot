@@ -73,15 +73,3 @@ streamlit run app.py
 - Improve accuracy with domain-specific fine-tuned models.
 - Enhance UI/UX for a better user experience.
 
-## 📜 License
-
-This project is licensed under the MIT License.
-
-## 🤝 Contributing
-
-Feel free to open issues or submit pull requests to enhance Agri Bot!
-
-## 📧 Contact
-
-For any queries or suggestions, reach out at [your-email@example.com](mailto\:your-email@example.com).
-
