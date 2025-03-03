@@ -65,7 +65,7 @@ def get_conversational_agent():
         agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
         memory=st.session_state.chat_memory,
         verbose=True,
-        return_intermediate_steps=False
+        return_intermediate_steps=False,
         max_iterations=5,
         handle_parsing_errors=True
     )
@@ -100,9 +100,6 @@ def main():
         st.session_state.chat_memory.clear()
         st.session_state.messages = []
         st.success("Chat history cleared!")
-    
-    selected_language = st.sidebar.selectbox("Select Language:", list(available_languages.keys()), index=0)  # Default English
-    language_code = available_languages[selected_language]
     
     if "messages" not in st.session_state:
         st.session_state.messages = []
