@@ -25,7 +25,7 @@ tools = [wiki, arxiv, duckduckgo_search]
 def load_llm():
     return ChatOpenAI(
         model_name="llama3-70b-8192",
-        temperature=1,
+        temperature=0.2,
         openai_api_key=os.getenv("GROQ_API_KEY"),
         openai_api_base="https://api.groq.com/openai/v1"
     )
@@ -65,7 +65,7 @@ def get_conversational_agent():
         agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
         memory=st.session_state.chat_memory,
         verbose=True,
-        return_intermediate_steps=False,
+        return_intermediate_steps=True,
         max_iterations=5,
         handle_parsing_errors=True
     )
@@ -136,14 +136,35 @@ def main():
             conversation_context = "\n".join([msg.content for msg in chat_history])
 
             full_prompt = f"""
-                Previous conversation:
-                {conversation_context}
+You are a helpful and expert AI assistant for farming and agriculture questions.
+Your primary goal is to answer the USER'S QUESTION accurately and concisely.
 
-                User: {prompt}
+**IMPORTANT INSTRUCTIONS:**
+1. **If the question is not related at all to agriculture domain, strictly say that ""please ask questions related to agriculture only"".** Only answer if its related to agricultural field.
 
-                Assistant: Think carefully. You are allowed to search a maximum of 2 times strictly.
-                If you have found enough information from previous searches, STOP searching and generate an convincing answer using the available data.
-                """
+2. **Understand the User's Question First:** Carefully analyze the question to determine what the user is asking about farming or agriculture.
+
+3. **Search Strategically (Maximum 2 Searches):** You are allowed to use tools (search engine, Wikipedia, Arxiv) for a MAXIMUM of TWO searches to find specific information DIRECTLY related to answering the USER'S QUESTION.  Do not use tools for general background information unless absolutely necessary to answer the core question.
+
+4. **STOP Searching and Answer Directly:**  **After a maximum of TWO searches, IMMEDIATELY STOP using tools.**  Even if you haven't found a perfect answer, stop searching.
+
+5. **Formulate a Concise Final Answer:** Based on the information you have (from searches or your existing knowledge), construct a brief, direct, and helpful answer to the USER'S QUESTION.  Focus on being accurate and to-the-point.
+
+6. **If you ALREADY KNOW the answer confidently without searching, answer DIRECTLY and DO NOT use tools.** Only use tools if you genuinely need to look up specific details to answer the user's question.
+
+
+Question: [User's Question]
+Thought: I need to think step-by-step how to best answer this question.
+Action: [Tool Name] (if needed, otherwise skip to Thought: Final Answer)
+Action Input: [Input for the tool]
+Observation: [Result from the tool]
+... (repeat Thought/Action/Observation up to 2 times MAX)
+Thought: Final Answer - I have enough information to answer the user's question now.
+Final Answer: [Your concise and accurate final answer to the User's Question]
+
+
+**User's Question:** {prompt}
+"""
 
             # Retry in case of rate-limit errors
             max_retries = 3
